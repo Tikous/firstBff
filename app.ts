@@ -44,6 +44,6 @@ app.context.render = co.wrap(
 app.use(historyApiFallback({ index: '/', whiteList: ['/api'] }));
 app.use(scopePerRequest(container));
 app.use(loadControllers(`${__dirname}/routers/*.ts`));
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 })

@@ -1,1 +1,162 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Document</title><link rel="icon" href="./favicon.ico"><script defer="defer" src="./scripts/main.e4a31.bundle.js"></script><link href="./styles/main.4749d.css" rel="stylesheet"></head><body><div id="app"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/styles/index.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .loading {
+      color: #666;
+      font-style: italic;
+    }
+    .error {
+      color: #e74c3c;
+      background: #fdf2f2;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #e74c3c;
+    }
+    .data-container {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      border-left: 4px solid #007bff;
+    }
+    .data-item {
+      margin: 10px 0;
+      padding: 8px;
+      background: white;
+      border-radius: 4px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>API 数据获取示例</h1>
+    <p>当前数据: <span id="staticData">{{data}}</span></p>
+    
+    <button id="fetchBtn" onclick="fetchApiData()">获取 API 数据</button>
+    
+    <div id="result">
+      <!-- API 数据将显示在这里 -->
+    </div>
+  </div>
+
+  <script>
+    // 获取API数据的函数
+    async function fetchApiData() {
+      const resultDiv = document.getElementById('result');
+      const fetchBtn = document.getElementById('fetchBtn');
+      
+      // 显示加载状态
+      resultDiv.innerHTML = '<div class="loading">正在加载数据...</div>';
+      fetchBtn.disabled = true;
+      fetchBtn.textContent = '加载中...';
+      
+      try {
+        // 调用 /api/list 接口
+        const response = await fetch('/api/list', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        // 检查响应是否成功
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        // 解析JSON数据
+        const result = await response.json();
+        
+        // 显示数据
+        displayData(result);
+        
+      } catch (error) {
+        // 显示错误信息
+        resultDiv.innerHTML = `
+          <div class="error">
+            <h3>获取数据失败</h3>
+            <p>错误信息: ${error.message}</p>
+          </div>
+        `;
+      } finally {
+        // 恢复按钮状态
+        fetchBtn.disabled = false;
+        fetchBtn.textContent = '获取 API 数据';
+      }
+    }
+    
+    // 显示数据的函数
+    function displayData(result) {
+      const resultDiv = document.getElementById('result');
+      
+      if (result && result.data) {
+        const { item, result: resultArray } = result.data;
+        
+        resultDiv.innerHTML = `
+          <div class="data-container">
+            <h3>API 返回的数据:</h3>
+            <div class="data-item">
+              <strong>项目:</strong> ${item}
+            </div>
+            <div class="data-item">
+              <strong>结果数组:</strong> ${JSON.stringify(resultArray)}
+            </div>
+            <div class="data-item">
+              <strong>完整数据:</strong>
+              <pre>${JSON.stringify(result, null, 2)}</pre>
+            </div>
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <div class="error">
+            <h3>数据格式异常</h3>
+            <p>返回的数据: ${JSON.stringify(result)}</p>
+          </div>
+        `;
+      }
+    }
+    
+    // 页面加载完成后自动获取一次数据
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('页面加载完成，可以调用API了');
+      // 如果想要页面加载时自动获取数据，取消下面这行的注释
+      // fetchApiData();
+    });
+  </script>
+</body>
+</html>
