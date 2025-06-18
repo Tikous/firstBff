@@ -40,10 +40,10 @@ app.context.render = co.wrap(
   })
 );
 
-// 把除了api的真实路由，都给转回首页
-app.use(historyApiFallback({ index: '/', whiteList: ['/api'] }));
 app.use(scopePerRequest(container));
 app.use(loadControllers(`${__dirname}/routers/*.ts`));
+// 把除了api的真实路由，都给转回首页
+app.use(historyApiFallback({ index: '/', whiteList: ['/api'] }));
 app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 })
