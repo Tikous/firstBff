@@ -40,7 +40,6 @@ app.context.render = co.wrap(
   })
 );
 
-app.use(scopePerRequest(container));
 app.use(loadControllers(`${__dirname}/routers/*.ts`));
 // 把除了api的真实路由，都给转回首页
 app.use(historyApiFallback({ index: '/', whiteList: ['/api'] }));
